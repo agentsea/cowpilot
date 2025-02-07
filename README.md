@@ -11,5 +11,5 @@ pip install cowpilot
 ## Usage
 
 ```bash
-cowpilot
+cowpilot "Is today a good day?"
 ```
