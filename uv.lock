@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "openai" }]
+requires-dist = [{ name = "openai", specifier = ">=1.61.1" }]
 
 [[package]]
 name = "distro"

@@ -26,48 +26,6 @@ def load_cow_file(cow_path: str) -> str:
         raise ValueError(f"Could not load .cow file {cow_path}: {e}")
 
 
-def get_llm_response_chat_stream(
-    prompt: str,
-    model: str = "gpt-4o",
-    max_tokens: int = 100,
-    temperature: float = 0.7,
-):
-    """
-    Stream the response from the OpenAI ChatCompletion API
-    and return the entire response text after streaming.
-    """
-
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    if not client.api_key:
-        raise ValueError("Missing OPENAI_API_KEY environment variable.")
-
-    system = """You are the terminal based cowsay program upgraded with AI. You are witty, rowdy, and 
-a cow. When you aren't entertaining people in the terminal, you are protecting the most important 
-cow in the whole world, Gemma Cow.
-"""
-
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": prompt},
-        ],
-        max_tokens=max_tokens,
-        temperature=temperature,
-        stream=True,  # <-- Enables token-by-token streaming
-    )
-
-    collected_chunks = []
-    for chunk in response:
-        chunk_message = chunk.choices[0].delta.get("content", "")
-        sys.stdout.write(chunk_message)
-        sys.stdout.flush()
-        collected_chunks.append(chunk_message)
-
-    final_answer = "".join(collected_chunks).strip()
-    return final_answer
-
-
 def cowsay_bubble_and_cow(text: str, cow_art: str, width: int = 40) -> None:
     """
     Print text in a cowsay-style ASCII bubble, then print the ASCII cow.
@@ -99,7 +57,7 @@ def cowsay_bubble_and_cow(text: str, cow_art: str, width: int = 40) -> None:
         print(f"< {line.ljust(max_length)} >")
     print(bottom_border)
 
-    # 4. Print the custom ASCII cow
+    # 4. Print the ASCII cow
     print(cow_art)
 
 
@@ -107,7 +65,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Streaming cowsay with optional .cow file."
     )
-    parser.add_argument("--cow", type=str, help="Path to a custom .cow file.")
+    parser.add_argument("-c", "--cow", type=str, help="Path to a custom .cow file.")
     parser.add_argument("prompt", nargs="*", help="Prompt to send to the LLM.")
     args = parser.parse_args()
 
@@ -127,20 +85,58 @@ def main():
             cowsay_bubble_and_cow(str(e), DEFAULT_COW)
             sys.exit(1)
     else:
-        # Fallback to the default cow ASCII
         cow_art = DEFAULT_COW
 
-    # 3. Get response from the LLM in a streaming fashion
+    # 3. Stream the AI response while continuously re-drawing the cow and bubble
     try:
-        llm_response = get_llm_response_chat_stream(user_prompt)
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        if not client.api_key:
+            raise ValueError("Missing OPENAI_API_KEY environment variable.")
+
+        system_message = """You are the terminal-based cowsay program upgraded with AI. 
+You are witty, rowdy, and a cow. When you aren't entertaining people in the terminal, 
+you are protecting the most important cow in the whole world, Gemma Cow.
+"""
+
+        # Create the streaming ChatCompletion
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_prompt},
+            ],
+            max_tokens=200,
+            temperature=0.7,
+            stream=True,  # stream token-by-token
+        )
+
+        partial_text = ""
+
+        # Clear screen and show initial (empty) speech bubble and cow
+        # so the cow is visible from the start
+        print("\x1b[2J\x1b[H", end="")  # Clear the screen, move cursor to top
+        cowsay_bubble_and_cow("", cow_art)
+
+        # Iterate over streaming chunks
+        for chunk in response:
+            chunk_message = chunk.choices[0].delta.content
+            if chunk_message:
+                partial_text += chunk_message
+
+                # Clear screen and re-draw bubble + cow with updated partial text
+                print("\x1b[2J\x1b[H", end="")
+                cowsay_bubble_and_cow(partial_text, cow_art)
+
+                # Optionally add a tiny sleep to reduce flicker
+                # time.sleep(0.02)
+
+        # Optionally, print a final newline
+        print()
+
     except Exception as e:
         # If something goes wrong, show error in cowsay style
         cowsay_bubble_and_cow(f"Error: {e}", cow_art)
         sys.exit(1)
-
-    # 4. Print a blank line (just for spacing) and then do cowsay
-    print()
-    cowsay_bubble_and_cow(llm_response, cow_art)
 
 
 if __name__ == "__main__":
