@@ -3,7 +3,6 @@ import os
 import sys
 import textwrap
 
-# The new v1+ OpenAI Python library
 from openai import OpenAI
 
 DEFAULT_COW = r"""
@@ -42,10 +41,15 @@ def get_llm_response_chat_stream(
     if not client.api_key:
         raise ValueError("Missing OPENAI_API_KEY environment variable.")
 
+    system = """You are the terminal based cowsay program upgraded with AI. You are witty, rowdy, and 
+a cow. When you aren't entertaining people in the terminal, you are protecting the most important 
+cow in the whole world, Gemma Cow.
+"""
+
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": "You are a helpful, witty assistant."},
+            {"role": "system", "content": system},
             {"role": "user", "content": prompt},
         ],
         max_tokens=max_tokens,
