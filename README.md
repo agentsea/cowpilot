@@ -1,2 +1,15 @@
-# cowsay-ai
-An AI cowsay
+# CowPilot
+
+An AI cowsay for your terminal.
+
+## Installation
+
+```bash
+pip install cowpilot
+```
+
+## Usage
+
+```bash
+cowpilot
+```

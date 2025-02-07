@@ -1,0 +1,26 @@
+[project]
+name = "cowpilot"
+version = "0.1.0"
+description = "A cow copliot for your terminal"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.61.1",
+]
+
+[tool.pyright]
+reportUnknownParameterType = false
+reportMissingTypeArgument = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportPrivateUsage = false
+reportUntypedFunctionDecorator = false
+reportUntypedBaseClass = false
+
+[project.scripts]
+cowpilot = "cowpilot.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
