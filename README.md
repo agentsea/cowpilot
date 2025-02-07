@@ -23,7 +23,15 @@ cowpilot "Is today a good day?"
                 ||----w |
                 ||     ||
 ```
-g
+
+## Custom Cow
+
+You can use a custom cow by passing a .cow file to the `-c` or `--cow` flag.
+
+```bash
+cowpilot -c cows/happy.cow "Is today a good day?"
+```
+
 ## Thanks
 
 To Tony Monroe for the greatest program of all time.
