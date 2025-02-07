@@ -15,7 +15,7 @@ cowpilot "Is today a good day?"
 ```
 ```
  _____________________________________
-< Is the sky blue? >
+< Did the Lakers beat the Supersonics? >
  -------------------------------------
         \   ^__^
          \  (oo)\_______
@@ -23,7 +23,7 @@ cowpilot "Is today a good day?"
                 ||----w |
                 ||     ||
 ```
-
+g
 ## Thanks
 
 To Tony Monroe for the greatest program of all time.
