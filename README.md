@@ -13,3 +13,11 @@ pip install cowpilot
 ```bash
 cowpilot "Is today a good day?"
 ```
+ ______________________
+< as good an any other >
+ ----------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
